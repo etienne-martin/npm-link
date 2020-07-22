@@ -19,5 +19,5 @@
   },
   "exclude": ["node_modules"],
   "include": ["./src/typings/**/*"],
-  "files": ["./src/index.ts"]
+  "files": ["./src/index.ts", "./src/worker.ts"]
 }
