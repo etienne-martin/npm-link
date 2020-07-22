@@ -4,7 +4,9 @@ import { debounce } from "ts-debounce";
 import path from "path";
 import fs from "fs-extra";
 import PQueue from "p-queue";
+
 import { execAsync, rmRf } from "./utils";
+import { getIgnorePatterns, isIgnored } from "./ignore";
 
 const {
   _: [dest]
@@ -15,7 +17,7 @@ const queue = new PQueue({ concurrency: 1 });
 
 // TODO: handle unhandledRejection and uncaughtException
 
-const mirrorPackage = () => {
+const mirrorPackage = debounce(() => {
   return queue.add(async () => {
     console.log("------------------");
     console.log("Packing package...");
@@ -32,6 +34,7 @@ const mirrorPackage = () => {
     const destination = path.join(destDir, packageName);
 
     console.log("Mirroring package...");
+
     await rmRf(`${destination}`);
     await fs.mkdir(destination);
     await execAsync(`cd ${destination} && npm init -y`);
@@ -60,14 +63,24 @@ npm install ${archivePath} \
 
     console.log("Installed dependencies");
   });
-};
+}, 500);
 
-const watcher = watch(srcDir, {
-  ignoreInitial: true
+const watcher = watch(path.join(srcDir, "**/!(node_modules|.git)"), {
+  ignoreInitial: true,
+  cwd: srcDir
 });
 
-// TODO: ignore files that are in .npmignore
-const onChange = debounce(mirrorPackage, 500);
+const onChange = async (path: string) => {
+  if ([".npmignore", ".gitignore"].includes(path)) {
+    await getIgnorePatterns(srcDir);
+  }
+
+  if (isIgnored(path)) return;
+
+  console.log("detected change:", path);
+
+  await mirrorPackage();
+};
 
 watcher
   .on("add", onChange)
@@ -75,4 +88,5 @@ watcher
   .on("unlink", onChange)
   .on("error", error => console.log(`Watcher error: ${error}`));
 
+getIgnorePatterns(srcDir);
 mirrorPackage();

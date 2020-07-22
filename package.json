@@ -18,8 +18,10 @@
     "chokidar": "^3.0.2",
     "console-clear": "^1.1.1",
     "fs-extra": "^9.0.1",
+    "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
     "p-queue": "^6.6.0",
+    "parse-gitignore": "^1.0.1",
     "rimraf": "^2.6.3",
     "ts-debounce": "^2.0.1"
   },
@@ -31,6 +33,7 @@
     "@types/jest": "24.0.17",
     "@types/minimist": "1.2.0",
     "@types/node": "12.6.8",
+    "@types/parse-gitignore": "^1.0.0",
     "@types/rimraf": "2.0.2",
     "@types/webpack": "4.32.1",
     "@types/webpack-node-externals": "1.6.3",
