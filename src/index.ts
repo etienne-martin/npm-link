@@ -65,8 +65,9 @@ npm install ${archivePath} \
   });
 }, 500);
 
-const watcher = watch(path.join(srcDir, "**/!(node_modules|.git)"), {
+const watcher = watch(srcDir, {
   ignoreInitial: true,
+  ignored: ["**/node_modules/**/*", "**/.git/**/*"],
   cwd: srcDir
 });
 
