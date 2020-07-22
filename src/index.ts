@@ -17,20 +17,32 @@ const queue = new PQueue({ concurrency: 1 });
 
 // TODO: handle unhandledRejection and uncaughtException
 
+const packageNameSelector = (archiveFilename: string) => {
+  const parsedPath = path.parse(archiveFilename);
+
+  return parsedPath.name
+    .split("-")
+    .slice(0, -1)
+    .join("-");
+};
+
+const npmPack = async (srcDir: string) => {
+  const stdout = await execAsync(`cd /tmp && npm pack ${srcDir}`);
+
+  return stdout.trim();
+};
+
+// TODO: run that in a child process
 const mirrorPackage = debounce(() => {
   return queue.add(async () => {
     console.log("------------------");
     console.log("Packing package...");
-    const archiveFilename = await execAsync(`cd /tmp && npm pack ${srcDir}`);
+    const archiveFilename = await npmPack(srcDir);
 
     console.log("Packed");
 
-    const parsedPath = path.parse(archiveFilename.trim());
-    const archivePath = path.join("/tmp", parsedPath.base);
-    const packageName = parsedPath.name
-      .split("-")
-      .slice(0, -1)
-      .join("-");
+    const archivePath = path.join("/tmp", archiveFilename);
+    const packageName = packageNameSelector(archiveFilename);
     const destination = path.join(destDir, packageName);
 
     console.log("Mirroring package...");

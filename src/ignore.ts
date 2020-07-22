@@ -1,12 +1,12 @@
-import _parseGitIgnore from "parse-gitignore";
+import parse from "parse-gitignore";
 import minimatch from "minimatch";
 import fs from "fs-extra";
-import path from "path";
+import path, { sep } from "path";
 
 let ignorePatterns: string[] = [];
 
 const parseIgnoreFile = async (path: string) => {
-  return _parseGitIgnore(await fs.readFile(path, "utf8"));
+  return parse(await fs.readFile(path, "utf8"));
 };
 
 // TODO: support the file property in package.json
@@ -24,13 +24,15 @@ export const getIgnorePatterns = async (srcDir: string) => {
     ignorePatterns = await parseIgnoreFile(gitignorePath);
     return;
   }
+
+  ignorePatterns = [];
 };
 
 export const isIgnored = (path: string) => {
   for (const ignorePattern of ignorePatterns) {
     if (minimatch(path, ignorePattern)) return true;
 
-    for (const filename of path.split("/")) {
+    for (const filename of path.split(sep)) {
       if (minimatch(filename, ignorePattern)) return true;
     }
   }
