@@ -23,7 +23,7 @@ export const spawnWorker = debounce(async ({ srcDir, destDir }) => {
   worker.once("message", terminateWorker);
   worker.once("exit", code => {
     if (code === 0) return;
-    process.exit(code);
+    // process.exit(code);
   });
   worker.postMessage({ srcDir, destDir });
 }, 500);
