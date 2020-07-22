@@ -37,7 +37,8 @@ module.exports = (env, argv) => {
                       }
                     }
                   ]
-                ]
+                ],
+                plugins: [["@babel/plugin-proposal-optional-chaining"]]
               }
             },
             {

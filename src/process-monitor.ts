@@ -6,6 +6,6 @@ process.on("uncaughtException", err => {
 });
 
 process.on("unhandledRejection", (err: any) => {
-  logger.error(err && err.message || err || "An unexpected error occurred.");
+  logger.error(err?.message || err || "An unexpected error occurred.");
   process.exit(1);
 });

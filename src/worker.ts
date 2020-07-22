@@ -4,7 +4,7 @@ import path from "path";
 import { debounce } from "ts-debounce";
 import { mirrorPackage } from "./package";
 
-const CWD = path.resolve(process.mainModule!.filename, "../../");
+const CWD = path.resolve(process.mainModule?.filename || "", "../../");
 const WORKER_PATH = path.resolve(CWD, "dist/worker.js");
 let worker: Worker | null = null;
 
@@ -33,7 +33,7 @@ if (parentPort) {
     "message",
     async ({ srcDir, destDir }: { srcDir: string; destDir: string }) => {
       await mirrorPackage({ srcDir, destDir });
-      parentPort!.postMessage("job done");
+      parentPort?.postMessage("job done");
     }
   );
 }

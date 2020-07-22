@@ -13,6 +13,8 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/explicit-function-return-type": 0,
-    "@typescript-eslint/no-explicit-any": 0
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/prefer-optional-chain": 2,
+    "@typescript-eslint/no-var-requires": 0
   }
 };
