@@ -1,11 +1,10 @@
 import minimist from "minimist";
 import { watch } from "chokidar";
 import { debounce } from "ts-debounce";
-import { exec } from "child_process";
 import path from "path";
-import rimraf from "rimraf";
 import fs from "fs-extra";
 import PQueue from "p-queue";
+import { execAsync, rmRf } from "./utils";
 
 const {
   _: [dest]
@@ -15,26 +14,6 @@ const destDir = path.resolve(dest, "node_modules");
 const queue = new PQueue({ concurrency: 1 });
 
 // TODO: handle unhandledRejection and uncaughtException
-
-const execAsync = (command: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout) => {
-      if (error) return reject(stdout);
-
-      resolve(stdout);
-    });
-  });
-};
-
-const rmRf = (path: string) => {
-  return new Promise((resolve, reject) => {
-    rimraf(path, err => {
-      if (err) return reject(err);
-
-      resolve();
-    });
-  });
-};
 
 const mirrorPackage = () => {
   return queue.add(async () => {
