@@ -1,6 +1,6 @@
-import path from "path";
+import path, { sep } from "path";
 import fs from "fs-extra";
-import { execAsync, rmRf } from "./utils";
+import { execAsync, logger, rmRf } from "./utils";
 
 const packageNameSelector = (archiveFilename: string) => {
   const parsedPath = path.parse(archiveFilename);
@@ -12,7 +12,11 @@ const packageNameSelector = (archiveFilename: string) => {
 };
 
 const npmPack = async (srcDir: string) => {
+  logger.wait("packaging...");
+
   const stdout = await execAsync(`cd /tmp && npm pack ${srcDir}`);
+
+  logger.info("packaged successfully");
 
   return stdout.trim();
 };
@@ -24,26 +28,17 @@ export const mirrorPackage = async ({
   srcDir: string;
   destDir: string;
 }) => {
-  console.log("------------------");
-  console.log("Packing package...");
   const archiveFilename = await npmPack(srcDir);
-
-  console.log("Packed");
-
   const archivePath = path.join("/tmp", archiveFilename);
   const packageName = packageNameSelector(archiveFilename);
   const destination = path.join(destDir, packageName);
+  const destinationName = destDir.split(sep).slice(-2)[0];
 
-  console.log("Mirroring package...");
+  logger.wait(`installing package in ${destinationName}...`);
 
   await rmRf(`${destination}`);
   await fs.mkdir(destination);
   await execAsync(`cd ${destination} && npm init -y`);
-
-  console.log("Mirrored");
-
-  console.log("Installing dependencies...");
-
   await execAsync(`cd ${destination} && \
 npm install ${archivePath} \
 --no-package-lock \
@@ -62,5 +57,5 @@ npm install ${archivePath} \
 
   await rmRf(path.join(destination, "node_modules", packageName));
 
-  console.log("Installed dependencies");
+  logger.info("installed successfully");
 };

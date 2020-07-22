@@ -3,6 +3,7 @@ import { watch } from "chokidar";
 import path from "path";
 import { getIgnorePatterns, isIgnored } from "./ignore";
 import { spawnWorker } from "./worker";
+import { logger } from "./utils";
 
 const {
   _: [dest]
@@ -23,7 +24,7 @@ const onChange = async (path: string) => {
 
   if (isIgnored(path)) return;
 
-  console.log("detected change:", path);
+  logger.event("detected change:", path);
 
   await spawnWorker({ srcDir, destDir });
 };
@@ -32,7 +33,8 @@ watcher
   .on("add", onChange)
   .on("change", onChange)
   .on("unlink", onChange)
-  .on("error", error => console.log(`Watcher error: ${error}`));
+  .on("ready", () => logger.ready("watching for changes"))
+  .on("error", error => logger.error(`watcher error: ${error}`));
 
 getIgnorePatterns(srcDir);
 spawnWorker({ srcDir, destDir });
