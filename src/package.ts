@@ -1,15 +1,7 @@
-import path, { sep } from "path";
+import path from "path";
 import fs from "fs-extra";
 import { execAsync, logger, rmRf } from "./utils";
-
-const packageNameSelector = (archiveFilename: string) => {
-  const parsedPath = path.parse(archiveFilename);
-
-  return parsedPath.name
-    .split("-")
-    .slice(0, -1)
-    .join("-");
-};
+import { getPackageJson } from "./utils/package-json";
 
 const npmPack = async (srcDir: string) => {
   logger.wait("packaging...");
@@ -18,7 +10,7 @@ const npmPack = async (srcDir: string) => {
 
   logger.info("packaged successfully");
 
-  return stdout.trim();
+  return path.join("/tmp", stdout.trim());
 };
 
 export const mirrorPackage = async ({
@@ -28,18 +20,25 @@ export const mirrorPackage = async ({
   srcDir: string;
   destDir: string;
 }) => {
-  const archiveFilename = await npmPack(srcDir);
-  const archivePath = path.join("/tmp", archiveFilename);
-  const packageName = packageNameSelector(archiveFilename);
-  const destination = path.join(destDir, packageName);
-  const destinationName = destDir.split(sep).slice(-2)[0];
+  const archivePath = await npmPack(srcDir);
+  const srcPackage = getPackageJson(srcDir);
+  const destPackage = getPackageJson(destDir);
+  const destNodeModules = path.join(destDir, "node_modules");
+  const installationPath = path.join(destDir, "node_modules", srcPackage.name);
 
-  logger.wait(`installing package in ${destinationName}...`);
+  logger.wait(
+    `installing ${srcPackage.name}@${srcPackage.version} in ${destPackage.name}@${destPackage.version}...`
+  );
 
-  await rmRf(`${destination}`);
-  await fs.mkdir(destination);
-  await execAsync(`cd ${destination} && npm init -y`);
-  await execAsync(`cd ${destination} && \
+  await rmRf(`${installationPath}`);
+
+  if (!(await fs.pathExists(destNodeModules))) {
+    await fs.mkdir(destNodeModules);
+  }
+
+  await fs.mkdir(installationPath);
+  await execAsync(`cd ${installationPath} && npm init -y`);
+  await execAsync(`cd ${installationPath} && \
 npm install ${archivePath} \
 --no-package-lock \
 --only=prod \
@@ -48,14 +47,14 @@ npm install ${archivePath} \
 --force`);
 
   await fs.copy(
-    path.join(destination, "node_modules", packageName),
-    destination,
+    path.join(installationPath, "node_modules", srcPackage.name),
+    installationPath,
     {
       overwrite: true
     }
   );
 
-  await rmRf(path.join(destination, "node_modules", packageName));
+  await rmRf(path.join(installationPath, "node_modules", srcPackage.name));
 
-  logger.info("installed successfully");
+  logger.ready("installed successfully");
 };
