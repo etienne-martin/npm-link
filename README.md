@@ -1,6 +1,6 @@
 # npm-link
 
-An alternative to `npm link` and `yarn link` to mirror a package folder during development.
+An symlink-free alternative to `npm link` and `yarn link` to mirror a package folder during development.
 
 ## Getting Started
 
