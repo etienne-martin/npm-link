@@ -1,4 +1,5 @@
 import "./process-monitor";
+import "./help";
 import minimist from "minimist";
 import { watch } from "chokidar";
 import path from "path";
@@ -6,19 +7,17 @@ import { getIgnorePatterns, isIgnored } from "./ignore";
 import { spawnWorker } from "./worker";
 import { logger } from "./utils";
 import { getPackageJson } from "./utils/package-json";
-import { help } from "./help";
 
 const {
   _: [dest]
 } = minimist(process.argv.slice(2));
 
-if (!dest) help();
-
-require("console-clear")();
-
 const srcDir = process.cwd();
 const destDir = path.resolve(dest);
 const packageJson = getPackageJson(srcDir);
+
+getPackageJson(destDir);
+require("console-clear")();
 
 const watcher = watch(srcDir, {
   ignoreInitial: true,
