@@ -41,11 +41,7 @@ watcher
   .on("add", onChange)
   .on("change", onChange)
   .on("unlink", onChange)
-  .on("ready", () =>
-    logger.ready(
-      `watching ${src} for changes`
-    )
-  )
+  .on("ready", () => logger.ready(`watching ${src} for changes`))
   .on("error", error => logger.error(`watcher error: ${error}`));
 
 getIgnorePatterns(srcDir);

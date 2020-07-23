@@ -26,9 +26,7 @@ export const mirrorPackage = async ({
   destDir: string;
 }) => {
   if (!(await fs.pathExists(path.join(srcDir, "package.json")))) {
-    return logger.warn(
-      `Could not locate a package.json at: ${srcDir}`
-    );
+    return logger.warn(`Could not locate a package.json at: ${srcDir}`);
   }
 
   const srcPackage = getPackageJson(srcDir);
