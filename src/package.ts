@@ -10,7 +10,9 @@ const npmPack = async (srcDir: string) => {
 
   logger.info("packaged successfully");
 
-  return path.join("/tmp", stdout.trim());
+  const [packageName] = stdout.trim().split("\n").slice(-1);
+
+  return path.join("/tmp", packageName);
 };
 
 export const mirrorPackage = async ({
@@ -30,16 +32,12 @@ export const mirrorPackage = async ({
     `installing ${srcPackage.name}@${srcPackage.version} in ${destPackage.name}@${destPackage.version}...`
   );
 
-  await rmRf(`${installationPath}`);
-
-  if (!(await fs.pathExists(destNodeModules))) {
-    await fs.mkdir(destNodeModules);
-  }
-
-  await fs.mkdir(installationPath);
-  await execAsync(`cd ${installationPath} && npm init -y`);
-  await execAsync(`cd ${installationPath} && \
-npm install ${archivePath} \
+  await rmRf(`${installationPath}/*`);
+  await fs.ensureDir(destNodeModules);
+  await fs.ensureDir(installationPath);
+  await execAsync(`cd "${installationPath}" && npm init -y`);
+  await execAsync(`cd "${installationPath}" && \
+npm install "${archivePath}" \
 --no-package-lock \
 --only=prod \
 --no-audit \
