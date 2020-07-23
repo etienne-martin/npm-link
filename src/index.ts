@@ -4,7 +4,7 @@ import minimist from "minimist";
 import { watch } from "chokidar";
 import path from "path";
 import { getIgnorePatterns, isIgnored } from "./ignore";
-import { spawnWorker } from "./worker";
+import { spawnWorker, terminateWorker } from "./worker";
 import { logger } from "./utils";
 import { getPackageJson } from "./utils/package-json";
 
@@ -34,6 +34,7 @@ const onChange = async (path: string) => {
 
   logger.event("detected change:", path);
 
+  await terminateWorker();
   await spawnWorker({ srcDir, destDir });
 };
 

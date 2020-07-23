@@ -8,8 +8,10 @@ const CWD = path.resolve(process.mainModule?.filename || "", "../../");
 const WORKER_PATH = path.resolve(CWD, "dist/worker.js");
 let worker: Worker | null = null;
 
-const terminateWorker = async () => {
+export const terminateWorker = async () => {
   if (!worker) return;
+
+  worker.removeAllListeners();
 
   await worker.terminate();
   worker = null;

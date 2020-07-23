@@ -10,7 +10,10 @@ const npmPack = async (srcDir: string) => {
 
   logger.info("packaged successfully");
 
-  const [packageName] = stdout.trim().split("\n").slice(-1);
+  const [packageName] = stdout
+    .trim()
+    .split("\n")
+    .slice(-1);
 
   return path.join("/tmp", packageName);
 };
