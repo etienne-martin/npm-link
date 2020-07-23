@@ -20,8 +20,8 @@ Navigate to the root folder of the package you want to mirror:
 cd my-package
 ```
 
-Then run `npm-link`, where `<destination>` is a project to which you want to mirror your package:
+Then run `npm-link`, where `<installation-folder>` is a project to which you want to mirror your package:
 
 ```bash
-npm-link <destination>
+npm-link <package-folder> <installation-folder>
 ```

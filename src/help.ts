@@ -6,10 +6,11 @@ const {
 
 if (!dest) {
   console.log(`-----------------------------
-Usage: npm-link <destination>
+Usage: npm-link <package-folder> <installation-folder>
 -----------------------------
-  
-destination: a project to which you want to mirror your package
+
+Package folder: a path to the package you want to mirror
+Installation folder: a path to a project to which you want to mirror your package
 `);
   process.exit(0);
 }

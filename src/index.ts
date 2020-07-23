@@ -9,12 +9,11 @@ import { logger } from "./utils";
 import { getPackageJson } from "./utils/package-json";
 
 const {
-  _: [dest]
+  _: [src, dest]
 } = minimist(process.argv.slice(2));
 
-const srcDir = process.cwd();
+const srcDir = path.resolve(src);
 const destDir = path.resolve(dest);
-const packageJson = getPackageJson(srcDir);
 
 getPackageJson(destDir);
 require("console-clear")();
@@ -44,7 +43,7 @@ watcher
   .on("unlink", onChange)
   .on("ready", () =>
     logger.ready(
-      `watching ${packageJson.name}@${packageJson.version} for changes`
+      `watching ${src} for changes`
     )
   )
   .on("error", error => logger.error(`watcher error: ${error}`));
